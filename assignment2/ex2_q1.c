@@ -108,7 +108,7 @@ int getGreatestCommonDivisor(int first, int second) {
 fraction** createMatrix(int rows, int cols)
 {
     // your code:
-    fraction **matrix = (fraction**)malloc(rows * sizeof(fraction));
+    fraction **matrix = (fraction**)malloc(rows * sizeof(fraction*));
     for (int i = 0; i < rows; i++)
         matrix[i] = (fraction*)malloc(cols * sizeof(fraction));
 
@@ -131,9 +131,7 @@ fraction** matrixAverageNeighbor(int A[][COLS], int rows, int cols)
     fraction **matrix = createMatrix(rows, cols);
     for (int i = 0 ; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            printf("i: %d, j: %d", i, j);
             matrix[i][j] = neighborFractionAverage(A,i,j,rows,cols);
-            printf("\nFRACTION STRUCT IS: %d %d/%d\n", matrix[i][j].num, matrix[i][j].numerator, matrix[i][j].denominator);
         }
     }
     return matrix;
@@ -153,27 +151,25 @@ fraction** matrixAverageNeighbor(int A[][COLS], int rows, int cols)
 fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols)
 {
     // your code:
-    struct fraction avgFraction = *(fraction *)malloc(sizeof(fraction));
-    int sum = 0, gcd, divisor = 0;
+    struct fraction * avgFraction = (fraction *)malloc(sizeof(fraction));
+    int sum = 0, divisor = 0, gcd, neighbouri, neighbourj;
     int offseti[] = {-1, -1, -1, 0, 0, 1, 1, 1 };
     int offsetj[] = {-1, 0, 1, -1, 1, -1, 0, 1 };
-    printf("\nCalculating offsets for A[%d][%d] - (%d) \n" ,i, j, A[i][j]);
     for (int n = 0; n < 8; n++) {
-        int neighbouri = i + offseti[n];
-        int neighbourj = j + offsetj[n];
+        neighbouri = i + offseti[n];
+        neighbourj = j + offsetj[n];
         if (neighbouri < 0 || neighbouri >= rows || neighbourj < 0 || neighbourj >= cols) {
             continue;
         }
         divisor++;
-        printf("ADDING A[%d][%d] = %d\n", neighbouri, neighbourj, A[neighbouri][neighbourj]);
         sum += A[neighbouri][neighbourj];
     }
+    avgFraction->num = (int)(sum/divisor);
     gcd = getGreatestCommonDivisor(sum, divisor);
-    avgFraction.denominator = divisor/gcd;
-    avgFraction.numerator = (sum%divisor)/gcd;
-    avgFraction.num = (int)(sum/divisor);
+    avgFraction->numerator = (sum%divisor)/gcd;
+    avgFraction->denominator = divisor/gcd;
 
-    return avgFraction;
+    return *avgFraction;
 }
 // --------------------------- //
 
@@ -191,7 +187,8 @@ void printMatrix(fraction** B, int rows, int cols)
     // your code:
     for (int i = 0; i < rows; i ++) {
         for (int j = 0; j < cols; j++) {
-            printf("%d %d/%d, ", B[i][j].num, B[i][j].numerator, B[i][j].denominator);
+            fraction curr = B[i][j];
+            printf("%10.2f ", curr.num+(double)curr.numerator/curr.denominator);
         }
         puts("\n");
     }
