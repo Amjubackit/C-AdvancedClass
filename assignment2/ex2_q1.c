@@ -151,7 +151,7 @@ fraction** matrixAverageNeighbor(int A[][COLS], int rows, int cols)
 fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols)
 {
     // your code:
-    struct fraction * avgFraction = (fraction *)malloc(sizeof(fraction));
+    struct fraction avgFraction;
     int sum = 0, divisor = 0, gcd, neighbouri, neighbourj;
     int offseti[] = {-1, -1, -1, 0, 0, 1, 1, 1 };
     int offsetj[] = {-1, 0, 1, -1, 1, -1, 0, 1 };
@@ -164,12 +164,12 @@ fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols
         divisor++;
         sum += A[neighbouri][neighbourj];
     }
-    avgFraction->num = (int)(sum/divisor);
+    avgFraction.num = (int)(sum/divisor);
     gcd = getGreatestCommonDivisor(sum, divisor);
-    avgFraction->numerator = (sum%divisor)/gcd;
-    avgFraction->denominator = divisor/gcd;
+    avgFraction.numerator = (sum%divisor)/gcd;
+    avgFraction.denominator = divisor/gcd;
 
-    return *avgFraction;
+    return avgFraction;
 }
 // --------------------------- //
 
