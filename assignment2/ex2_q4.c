@@ -62,7 +62,6 @@ int main()
 #endif
 // --------------------------- //
 
-
 // --------------------------- //
 // function implementation section:
 unsigned long student_id()
@@ -71,7 +70,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
-
+    return 316517390;
 }
 // --------------------------- //
 
@@ -120,6 +119,10 @@ list* createListFromArray(int* arr, int n)
 void printList(list* lst)
 {
     // your code:
+    while (lst) {
+        printf("%d%s", lst->data, (lst->next) ? ", ": "\n");
+        lst = lst->next;
+    }
 }
 // --------------------------- //
 
@@ -136,6 +139,36 @@ void printList(list* lst)
 void partition(list** lst, list** pivot, list** small, list** big)
 {
     // your code:
+    if (!(*lst)) {
+        return;
+    }
+    // Pivot needs to point to the list head, and then be detached from the list
+    *pivot = *lst;
+    // Remove pivot from the list
+    *lst = (*pivot)->next;
+    // Detach by unset 'next'
+    (*pivot)->next = NULL;
+
+    list *tmp = NULL; // Used for swapping
+    // 'operate' is a dynamically set pointer to a list's head.
+    // the value will be set according to the currently tested node's value
+    // compared to the pivot.
+    // Then a consolidated operation would be performed on the correct list.
+    list **operate = NULL;
+    while (*lst) {
+        operate = small; // Default option
+        if ((*lst)->data > (*pivot)->data) {
+            // current node is greater than pivot:
+            operate = big;
+        }
+        tmp = (*lst);
+        (*lst) = (*lst)->next;
+        tmp->next = (*operate);
+        (*operate) = tmp;
+    }
+    if (*lst != NULL) {
+        return;
+    }
 }
 // --------------------------- //
 
@@ -150,6 +183,41 @@ void partition(list** lst, list** pivot, list** small, list** big)
 void quickSortList(list** lst)
 {
     // your code:
+    list *pivot = NULL;
+    list *small = NULL;
+    list *big = NULL;
+    if (!(*lst)) {
+        return;
+    }
+    partition(lst, &pivot, &small, &big);
+    quickSortList(&small);
+    quickSortList(&big);
+
+    // By default, set pivot as lst's head (might be overriden later)
+    *lst = pivot;
+    if (small) {
+        // Small list is populated, so need to:
+        // - Set small's head as lst's head
+        // - Connect small's tail and pivot
+        *lst = small;
+
+        // get to the end of 'small', and append pivot
+        list* tmp = small;
+        while (tmp) {
+            if (!tmp->next) {
+                tmp->next = pivot;
+                break;
+            }
+            tmp = tmp->next;
+        }
+    }
+    // Connect pivot to 'big' list. No worries if big is NULL
+    pivot->next = big;
+
+    // At this point (*lst) is pointing at either:
+    // - pivot as a single node (if list was single node)
+    // - pivot, connected to the big's head if it was populated
+    // - small's head, connected to pivot, and potentially big's head
 }
 // --------------------------- //
 
@@ -162,5 +230,11 @@ void quickSortList(list** lst)
 void freeList(list** lst)
 {
     // your code:
+    list *tmp;
+    while (*lst) {
+        tmp = *lst; // Keep ptr for deletion
+        *lst = (*lst)->next; // Advance in the list
+        free(tmp); // Free saved ptr
+    }
 }
 // --------------------------- //
