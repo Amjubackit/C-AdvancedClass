@@ -43,7 +43,7 @@ int main()
     unsigned long id_num;
     int n;
     list* lst = NULL, *new = NULL;
-    int arr[] = { 3, 6, 1, 9, 8, 4, 5 };
+    int arr[] = { 5, 3, 6, 1, 9, 8, 4, 5 };
 
     // call functions:
     id_num = student_id();
@@ -75,7 +75,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
-
+    return 316517390;
 }
 // --------------------------- //
 
@@ -124,6 +124,10 @@ list* createListFromArray(int* arr, int n)
 void printList(list* lst)
 {
     // your code:
+    while (lst) {
+        printf("%d%s", lst->data, (lst->next) ? ", ": "\n");
+        lst = lst->next;
+    }
 }
 // --------------------------- //
 
@@ -137,6 +141,12 @@ void printList(list* lst)
 int deleteFirst(list** lst)
 {
     // your code:
+    if (!lst || !(*lst)) {
+        return 0;
+    }
+    list* tmp = *lst;
+    *lst = tmp->next;
+    return 1;
 }
 // --------------------------- //
 
@@ -150,6 +160,11 @@ int deleteFirst(list** lst)
 int deleteAfter(list* curr)
 {
     // your code:
+    if (!curr || !(curr->next)) {
+        return 0;
+    }
+    curr->next = curr->next->next;
+    return 1;
 }
 // --------------------------- //
 
@@ -164,6 +179,69 @@ int deleteAfter(list* curr)
 int splitList(list** lst, list** new)
 {
     // your code:
+    int rv = 0;
+    if (!lst || !(*lst)) {
+        return rv;
+    }
+    // iterate list
+    list *curr = *lst;
+    list *headOrig = *lst; // Should remain up until the very end
+    list *newList = NULL;
+    list *tmp = NULL;
+    while (curr) {
+        tmp = NULL;
+        // Remove element that is bigger than both 'prev' and next
+        // Extra conditions:
+        // if first bigger than second - remove
+        // if last bigger than 'prev' - remove
+
+        if ((curr == headOrig) &&               // First &
+            (!(curr->next) ||                   // (Last or
+            (curr->data > curr->next->data)))   // Bigger than next)
+        {
+            // First and last element - remove it
+            rv++;
+            tmp = curr;
+            curr = curr->next;
+            deleteFirst(lst);
+        }
+        else if (curr->next && !(curr->next->next) &&    // Next is last &
+            curr->next->data > curr->data)          // Bigger than current
+        {
+            tmp = curr->next;
+            rv++;
+            deleteAfter(curr);
+            curr = curr->next;
+        }
+
+        // STRATEGY - since we have no previous, we can compare curr, curr.next, and next.next
+        else if (curr->next &&
+            curr->next->next)
+        {
+            // All 3 exist, check if middle is biggest
+            list *mid = curr->next;
+            if ((curr->data < mid->data) &&
+                (mid->next->data < mid->data)) {
+                tmp = curr->next;
+                deleteAfter(curr);
+                rv++;
+                curr = curr->next;
+            }
+        }
+        if (tmp) {
+            if (newList) {
+                newList->next = tmp;
+            }
+            else {
+                *new = tmp;
+            }
+            newList = tmp;
+        }
+        else {
+            curr = curr->next;
+        }
+    }
+    return rv;
 }
 // --------------------------- //
 
@@ -176,5 +254,11 @@ int splitList(list** lst, list** new)
 void freeList(list** lst)
 {
     // your code:
+    list *tmp;
+    while (*lst) {
+        tmp = *lst; // Keep ptr for deletion
+        *lst = (*lst)->next; // Advance in the list
+        free(tmp); // Free saved ptr
+    }
 }
 // --------------------------- //
