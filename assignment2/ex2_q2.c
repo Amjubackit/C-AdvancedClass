@@ -85,7 +85,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
-
+    return 316517390;
 }
 // --------------------------- //
 
@@ -103,6 +103,52 @@ unsigned long student_id()
 int createArrayAndList(int A[][COLS], list** lst, four** arr, int rows, int cols)
 {
     // your code:
+    // Loop over all items in matrix
+    // check if item is a series candidate
+    // Add item to fourArr and fourList
+    list *tail = NULL;
+    list *temp = NULL;
+    int arrSize = 2; // Will be used as the degree to multiply upon reallocations
+    four *fArr = malloc(arrSize * sizeof(four));
+    int cnt = 0;
+    // Criteria check vars
+    int diff = 0;
+    int value = 0;
+    for (int i=0; i<rows; i++) {
+        for (int j=0; j<cols; j++) {
+            diff = j - i;
+            value = A[i][j];
+            // If the diff equals value-j, then we have found a series, otherwise, advance.
+            if ( diff != value-j) {
+                continue;
+            }
+            // Found a series!
+            // Array handling
+            temp = createElement(createFour(i,j,diff,value));
+            if (cnt == arrSize) {
+                // Not enough space, reallocate 2 times the size
+                arrSize*=2;
+                fArr = realloc(fArr, arrSize*2 * sizeof(four));
+            }
+            fArr[cnt++] = temp->data;
+
+            // Linked-list handling
+            if (!tail) {
+                // Assume first found item, set tail and (input) lst
+                tail = temp;
+                *lst = tail;
+                continue;
+            }
+            // Not the first found item, set tail's next, and advance tail
+            tail->next = temp;
+            tail = tail->next;
+        }
+    }
+    // Trim down the array to the exact required size
+    fArr = realloc(fArr, cnt * sizeof(four));
+
+    *arr = fArr; // Set (external) arr only after no reallocs might happen!
+    return cnt;
 }
 // --------------------------- //
 
@@ -118,6 +164,12 @@ int createArrayAndList(int A[][COLS], list** lst, four** arr, int rows, int cols
 four createFour(int i, int j, int d, int value)
 {
     // your code:
+    four rv;
+    rv.i = i;
+    rv.j = j;
+    rv.d = d;
+    rv.value = value;
+    return rv;
 }
 // --------------------------- //
 
@@ -130,6 +182,9 @@ four createFour(int i, int j, int d, int value)
 list* createElement(four data)
 {
     // your code:
+    list *rv = malloc(sizeof(list));
+    rv->data = data;
+    return rv;
 }
 // --------------------------- //
 
@@ -144,6 +199,13 @@ list* createElement(four data)
 void printArray(four* arr, int n)
 {
     // your code:
+    printf("|%10s|%10s|%10s|%10s|\n", "i", "j", "d", "value");
+
+    four curr;
+    for (int i=0; i < n; i++) {
+        curr = arr[i];
+        printf("|%10d|%10d|%10d|%10d|\n", curr.i, curr.j, curr.d, curr.value);
+    }
 }
 // --------------------------- //
 
@@ -157,6 +219,14 @@ void printArray(four* arr, int n)
 void printList(list* lst)
 {
     // your code:
+    printf("|%10s|%10s|%10s|%10s|\n", "i", "j", "d", "value");
+
+    four curr;
+    while (lst) {
+        curr = lst->data;
+        printf("|%10d|%10d|%10d|%10d|\n", curr.i, curr.j, curr.d, curr.value);
+        lst = lst->next;
+    }
 }
 // --------------------------- //
 
@@ -169,5 +239,20 @@ void printList(list* lst)
 void freeDynamic(list** lst, four** arr)
 {
     // your code:
+    // Release array
+    if (*arr) {
+        free(*arr);
+    }
+    // Release list
+    if (!lst) {
+        return;
+    }
+    list *tmp;
+    while (*lst) {
+        tmp = *lst; // Keep ptr for deletion
+        *lst = (*lst)->next; // Advance in the list
+        free(tmp); // Free saved ptr
+    }
+
 }
 // --------------------------- //
