@@ -33,7 +33,6 @@ int compareCircleLists(list** lst1, list** lst2);
 int circleListLength(list *lst);
 void printList(list* lst);
 void freeList(list** lst);
-
 // --------------------------------------- //
 // Main section:
 // --------------------------------------- //
@@ -41,9 +40,10 @@ int main()
 {
     unsigned long id_num;
     int result;
-    list* lst1 = NULL, *lst2 = NULL;
+    list* lst1 = NULL, * lst2 = NULL;
     char str1[] = "duezax";
     char str2[] = "zaxdue";
+
     // call functions:
     id_num = student_id();
     printf("[id: %lu] start main\n", id_num);
@@ -53,12 +53,10 @@ int main()
     // write output:
     printf("Output:\n");
     result = compareCircleLists(&lst1, &lst2);
-    printf("RESULTS: %d\n", result);
-
     printList(lst1);
     printList(lst2);
 
-//    // free list:
+    // free list:
     freeList(&lst1);
     freeList(&lst2);
 
