@@ -43,7 +43,7 @@ int main()
     int result;
     list* lst1 = NULL, *lst2 = NULL;
     char str1[] = "duezax";
-    char str2[] = "zaxdue";
+    char str2[] = "q";
     // call functions:
     id_num = student_id();
     printf("[id: %lu] start main\n", id_num);
@@ -154,8 +154,7 @@ void printList(list* lst)
 int compareCircleLists(list** lst1, list** lst2)
 {
     // your code:
-    int lst1Size, lst2Size, rv, failureCnt = 0, seqSuccessCnt = 0, startCntSuccess = 0, isEqual;
-    list *tmpHead1, *tmpHead2;
+    int lst1Size, lst2Size, rv;
 
     // Getting length of lists, comparing lengths.
     lst1Size = circleListLength(*lst1);
@@ -167,80 +166,49 @@ int compareCircleLists(list** lst1, list** lst2)
         return rv;
     }
 
-    tmpHead1 = *lst1;
-    tmpHead2 = *lst2;
-    // Checking content only if lengths are equal, and both lists are not empty.
+    list *temp, *head, *prev;
+    temp = head = prev = *lst1;
+    int minAscii = temp->data-0, nextAscii;
+    for (int i = 0; i < lst1Size; i++) {
+        nextAscii = temp->next->data-0;
+        if (nextAscii < minAscii) {
+            minAscii = nextAscii;
+            head = temp->next;
+            prev = temp;
+        }
+        temp = temp->next;
+    }
+    *lst1 = head;
+    prev->next = NULL;
+
+
+    list *temp2, *head2, *prev2;
+    temp2 = head2 = prev2 = *lst2;
+    int minAscii2 = temp->data-0, nextAscii2;
+    for (int j = 0; j < lst2Size; j++) {
+        nextAscii2 = temp2->next->data-0;
+        if (nextAscii2 < minAscii2) {
+            minAscii2 = nextAscii2;
+            head2 = temp2->next;
+            prev2 = temp2;
+        }
+        temp2 = temp2->next;
+    }
+    *lst2 = head2;
+    prev2->next = NULL;
+
     if (rv) {
-        // Using 2 counters here to follow failures and sequential successes.
-        // This loop will determine if the lists are equal or not.
-        while (failureCnt < lst1Size && seqSuccessCnt < lst1Size) {
-            // Turning isEqual on when data is equal
-            isEqual = (tmpHead1->data == tmpHead2->data) ? 1 : 0;
-            // Starting to progress second list only when there is a match
-            tmpHead2 = isEqual ? tmpHead2->next : tmpHead2;
-            tmpHead1 = tmpHead1->next;
-            // Failure cnt will increase each time there is miss-match,
-            // In case the first item not in second list, cnt will be 6 and loop will end --> rv = 0.
-            failureCnt += isEqual ? 0 : 1;
-            // startCntSuccess turns on after first match, tells seqSuccessCnt to start counting sequential successes.
-            startCntSuccess = isEqual ? 1 : startCntSuccess;
-            seqSuccessCnt += (isEqual) ? 1 : 0;
-            // Break loop in case startCntSuccess is turned on while isEqual is false, meaning that we started counting success,
-            // But found miss-match while doing so.
-            if (!isEqual && startCntSuccess) {
-                // Setting failureCnt to lst1Size so rv will be false
-                failureCnt = lst1Size;
+        for (int m = 0; m < lst1Size; m++) {
+            if ((*lst1)->data != (*lst2)->data) {
+                rv = 0;
                 break;
             }
-        }
-        rv = (failureCnt == lst1Size) ? 0 : 1;
-    }
-    // Breaking circles
-    if (*lst1) {
-        // In case linked list contain only 1 item
-        if (lst1Size == 1) {
-            (*lst1)->next = NULL;
-        }
-        else {
-            list *temp = *lst1, *head, *prev;
-            int minAscii = temp->data-0, nextAscii;
-            while(lst1Size--) {
-                nextAscii = temp->next->data-0;
-                if (nextAscii < minAscii) {
-                    minAscii = nextAscii;
-                    head = temp->next;
-                    prev = temp;
-                }
-                temp = temp->next;
-            }
-            *lst1 = head;
-            prev->next = NULL;
-        }
-    }
-    if (*lst2) {
-        // In case linked list contain only 1 item
-        if (lst2Size == 1) {
-            (*lst2)->next = NULL;
-        }
-        else {
-            list *temp = *lst2, *head, *prev;
-            int minAscii = temp->data-0, nextAscii;
-            while(lst2Size--) {
-                nextAscii = temp->next->data-0;
-                if (nextAscii < minAscii) {
-                    minAscii = nextAscii;
-                    head = temp->next;
-                    prev = temp;
-                }
-                temp = temp->next;
-            }
-            *lst2 = head;
-            prev->next = NULL;
         }
     }
 
     return rv;
 }
+
 // --------------------------- //
 
 
