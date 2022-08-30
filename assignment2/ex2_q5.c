@@ -40,7 +40,7 @@ int main()
 {
     unsigned long id_num;
     int result;
-    list* lst1 = NULL, * lst2 = NULL;
+    list* lst1 = NULL, *lst2 = NULL;
     char str1[] = "duezax";
     char str2[] = "zaxdue";
 
@@ -74,7 +74,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
-    return 313586869;
+    return ;
 
 }
 // --------------------------- //
@@ -151,24 +151,42 @@ void printList(list* lst)
 int compareCircleLists(list** lst1, list** lst2)
 {
     // your code:
-    int lst1Size, lst2Size, rv;
+    int lst1Size, lst2Size;
 
     // Getting length of lists, comparing lengths.
     lst1Size = circleListLength(*lst1);
     lst2Size = circleListLength(*lst2);
-    rv = (lst1Size != lst2Size) ? 0: 1;
 
-    // If both lists are empty, no need to "break circles" --> returns rv
-    if (lst2Size == 0 && lst1Size == 0) {
-        return rv;
-    }
+    /**
+     ALGO PSEUDO
+     Find first, and when found break the cycle
+     For each list:
+     - Iterate over the list
+     - If current->data lesser than minAscii:
+          set minAscii, and keep pointer to curr as (new) head
+          Reset previous' next to NULL
+     (Now we have two flat lists, we want to compare them)
+     If the size is different -> return 0
+     Iterate over each element in both lists in parallel,
+          if matching, continue
+          else, return 0
+     return 1
+     END ALGO PSEUDO
+     */
 
-    if (*lst1) {
-        list *curr, *head, *prev;
+    // In order to consolidate the code, push the list heads pointers to an array,
+    // and loop over the array
+    list **iter[] = {lst1, lst2};
+    for (int i=0; i<2; i++) {
+        if (!*(iter[i])) {
+            continue;
+        }
+        list *curr, *head, *prev = NULL;
         // Setting all to *lst to support 1 letter case
-        curr = head = prev = *lst1;
+        curr = head = *(iter[i]);
         int minAscii = curr->data-0;
-        for (int i = 0; i < lst1Size; i++) {
+        // Iterate until curr->next points to the (original) head, then curr is the last element.
+        while (curr->next != *(iter[i])) {
             if (curr->next->data-0 < minAscii) {
                 // Found lower ascii value, saving head as next and prev as current
                 minAscii = curr->next->data-0;
@@ -177,47 +195,30 @@ int compareCircleLists(list** lst1, list** lst2)
             }
             curr = curr->next;
         }
-        *lst1 = head;
+        // Setting prev to curr if it was never set inside the loop.
+        prev = (prev) ? prev: curr;
+        *(iter[i]) = head;
+        // Break the list cycle
         prev->next = NULL;
     }
 
-    /**
-     * DUPLICATE CODE --> BETTER FUNCTION THIS SHIT
-     */
-
-    if (*lst2) {
-        list *curr2, *head2, *prev2;
-        // Setting all to *lst to support 1 letter case
-        curr2 = head2 = prev2 = *lst2;
-        int minAscii2 = curr2->data-0;
-        for (int j = 0; j < lst2Size; j++) {
-            if (curr2->next->data-0 < minAscii2) {
-                // Found lower ascii value, saving head as next and prev as current
-                minAscii2 = curr2->next->data-0;
-                head2 = curr2->next;
-                prev2 = curr2;
-            }
-            curr2 = curr2->next;
-        }
-        *lst2 = head2;
-        prev2->next = NULL;
-    }
-    /**
-     * END OF DUPLICATE
-     */
-
-    // If size matches, iterating over data and comparing
-    if (rv) {
-        for (int m = 0; m < lst1Size; m++) {
-            if ((*lst1)->data != (*lst2)->data) {
-                // Set rv --> 0 and breaks if there is a miss-match
-                rv = 0;
-                break;
-            }
-        }
+    // If sizes don't match, early return 0 (False)
+    if (lst1Size != lst2Size) {
+        return 0;
     }
 
-    return rv;
+    // sizes match - iterating over data and comparing, returning 0 as soon as a mismatch is found
+    list * tempHead1 = *lst1;
+    list * tempHead2 = *lst2;
+    while(lst1Size--) {
+        if (tempHead1->data != tempHead2->data) {
+            return 0;
+        }
+        tempHead2 = tempHead2->next;
+        tempHead1 = tempHead1->next;
+    }
+
+    return 1;
 }
 
 // --------------------------- //
@@ -232,7 +233,7 @@ int compareCircleLists(list** lst1, list** lst2)
 int circleListLength(list* lst)
 {
     // your code:
-    if (!(lst)) {
+    if (!lst) {
         return 0;
     }
     // At least 1 item.
