@@ -43,13 +43,12 @@ int main()
     int result;
     list* lst1 = NULL, *lst2 = NULL;
     char str1[] = "duezax";
-    char str2[] = "q";
+    char str2[] = "zaxdue";
     // call functions:
     id_num = student_id();
     printf("[id: %lu] start main\n", id_num);
     lst1 = createCircleListFromString(str1);
     lst2 = createCircleListFromString(str2);
-//    printf("%d\n",circleListLength(lst2));
 
     // write output:
     printf("Output:\n");
@@ -166,40 +165,54 @@ int compareCircleLists(list** lst1, list** lst2)
         return rv;
     }
 
-    list *temp, *head, *prev;
-    temp = head = prev = *lst1;
-    int minAscii = temp->data-0, nextAscii;
-    for (int i = 0; i < lst1Size; i++) {
-        nextAscii = temp->next->data-0;
-        if (nextAscii < minAscii) {
-            minAscii = nextAscii;
-            head = temp->next;
-            prev = temp;
+    if (*lst1) {
+        list *curr, *head, *prev;
+        // Setting all to *lst to support 1 letter case
+        curr = head = prev = *lst1;
+        int minAscii = curr->data-0;
+        for (int i = 0; i < lst1Size; i++) {
+            if (curr->next->data-0 < minAscii) {
+                // Found lower ascii value, saving head as next and prev as current
+                minAscii = curr->next->data-0;
+                head = curr->next;
+                prev = curr;
+            }
+            curr = curr->next;
         }
-        temp = temp->next;
+        *lst1 = head;
+        prev->next = NULL;
     }
-    *lst1 = head;
-    prev->next = NULL;
 
+    /**
+     * DUPLICATE CODE --> BETTER FUNCTION THIS SHIT
+     */
 
-    list *temp2, *head2, *prev2;
-    temp2 = head2 = prev2 = *lst2;
-    int minAscii2 = temp->data-0, nextAscii2;
-    for (int j = 0; j < lst2Size; j++) {
-        nextAscii2 = temp2->next->data-0;
-        if (nextAscii2 < minAscii2) {
-            minAscii2 = nextAscii2;
-            head2 = temp2->next;
-            prev2 = temp2;
+    if (*lst2) {
+        list *curr2, *head2, *prev2;
+        // Setting all to *lst to support 1 letter case
+        curr2 = head2 = prev2 = *lst2;
+        int minAscii2 = curr2->data-0;
+        for (int j = 0; j < lst2Size; j++) {
+            if (curr2->next->data-0 < minAscii2) {
+                // Found lower ascii value, saving head as next and prev as current
+                minAscii2 = curr2->next->data-0;
+                head2 = curr2->next;
+                prev2 = curr2;
+            }
+            curr2 = curr2->next;
         }
-        temp2 = temp2->next;
+        *lst2 = head2;
+        prev2->next = NULL;
     }
-    *lst2 = head2;
-    prev2->next = NULL;
+    /**
+     * END OF DUPLICATE
+     */
 
+    // If size matches, iterating over data and comparing
     if (rv) {
         for (int m = 0; m < lst1Size; m++) {
             if ((*lst1)->data != (*lst2)->data) {
+                // Set rv --> 0 and breaks if there is a miss-match
                 rv = 0;
                 break;
             }
