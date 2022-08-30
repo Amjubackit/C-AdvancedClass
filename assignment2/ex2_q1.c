@@ -34,6 +34,7 @@ fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols
 void printMatrix(fraction** B, int rows, int cols);
 void freeMatrix(fraction** B, int rows);
 /** DECLARE HERE ONE FUNCTION ACCORDING TO YOUR NEEDS **/
+int getGreatestCommonDivisor(int first, int second);
 // --------------------------------------- //
 // Main section:
 // --------------------------------------- //
@@ -75,6 +76,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
+    return 313586869;
 
 }
 // --------------------------- //
@@ -88,6 +90,12 @@ unsigned long student_id()
 /// <returns>You decide</returns>
 
     // your code:
+int getGreatestCommonDivisor(int first, int second) {
+    if(second) {
+        return getGreatestCommonDivisor(second, first % second);
+    }
+    return first;
+}
 
 // --------------------------- //
 
@@ -100,6 +108,11 @@ unsigned long student_id()
 fraction** createMatrix(int rows, int cols)
 {
     // your code:
+    fraction **matrix = (fraction**)malloc(rows * sizeof(fraction*));
+    for (int i = 0; i < rows; i++)
+        matrix[i] = (fraction*)malloc(cols * sizeof(fraction));
+
+    return matrix;
 }
 // --------------------------- //
 
@@ -115,6 +128,13 @@ fraction** createMatrix(int rows, int cols)
 fraction** matrixAverageNeighbor(int A[][COLS], int rows, int cols)
 {
     // your code:
+    fraction **matrix = createMatrix(rows, cols);
+    for (int i = 0 ; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            matrix[i][j] = neighborFractionAverage(A,i,j,rows,cols);
+        }
+    }
+    return matrix;
 }
 // --------------------------- //
 
@@ -131,6 +151,25 @@ fraction** matrixAverageNeighbor(int A[][COLS], int rows, int cols)
 fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols)
 {
     // your code:
+    struct fraction avgFraction;
+    int sum = 0, divisor = 0, gcd, neighbouri, neighbourj;
+    int offseti[] = {-1, -1, -1, 0, 0, 1, 1, 1 };
+    int offsetj[] = {-1, 0, 1, -1, 1, -1, 0, 1 };
+    for (int n = 0; n < 8; n++) {
+        neighbouri = i + offseti[n];
+        neighbourj = j + offsetj[n];
+        if (neighbouri < 0 || neighbouri >= rows || neighbourj < 0 || neighbourj >= cols) {
+            continue;
+        }
+        divisor++;
+        sum += A[neighbouri][neighbourj];
+    }
+    avgFraction.num = (int)(sum/divisor);
+    gcd = getGreatestCommonDivisor(sum, divisor);
+    avgFraction.numerator = (sum%divisor)/gcd;
+    avgFraction.denominator = divisor/gcd;
+
+    return avgFraction;
 }
 // --------------------------- //
 
@@ -146,6 +185,13 @@ fraction neighborFractionAverage(int A[][COLS], int i, int j, int rows, int cols
 void printMatrix(fraction** B, int rows, int cols)
 {
     // your code:
+    for (int i = 0; i < rows; i ++) {
+        for (int j = 0; j < cols; j++) {
+            fraction curr = B[i][j];
+            printf("%10.2f ", curr.num+(double)curr.numerator/curr.denominator);
+        }
+        puts("\n");
+    }
 }
 // --------------------------- //
 
@@ -160,5 +206,9 @@ void printMatrix(fraction** B, int rows, int cols)
 void freeMatrix(fraction** B, int rows)
 {
     // your code:
+    for (int i = 0; i < rows; i++) {
+        free(B[i]);
+    }
+    free(B);
 }
 // --------------------------- //
