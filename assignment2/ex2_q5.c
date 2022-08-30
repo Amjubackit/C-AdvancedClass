@@ -33,6 +33,9 @@ int compareCircleLists(list** lst1, list** lst2);
 int circleListLength(list *lst);
 void printList(list* lst);
 void freeList(list** lst);
+
+void breakList(list **lst, int size);
+
 // --------------------------------------- //
 // Main section:
 // --------------------------------------- //
@@ -43,20 +46,23 @@ int main()
     list* lst1 = NULL, *lst2 = NULL;
     char str1[] = "duezax";
     char str2[] = "zaxdue";
-
+//    char str3[] = "xdueza";
     // call functions:
     id_num = student_id();
     printf("[id: %lu] start main\n", id_num);
     lst1 = createCircleListFromString(str1);
     lst2 = createCircleListFromString(str2);
+//    printf("%d\n",circleListLength(lst2));
 
     // write output:
     printf("Output:\n");
     result = compareCircleLists(&lst1, &lst2);
+    printf("RESULTS: %d\n", result);
+
     printList(lst1);
     printList(lst2);
 
-    // free list:
+//    // free list:
     freeList(&lst1);
     freeList(&lst2);
 
@@ -74,6 +80,7 @@ unsigned long student_id()
     // for example if your id is 595207432
     // return 595207432;
     // your code:
+    return 313586869;
 
 }
 // --------------------------- //
@@ -132,6 +139,10 @@ list* createCircleListFromString(char* str)
 void printList(list* lst)
 {
     // your code:
+    while (lst) {
+        printf("%c%s", lst->data, (lst->next) ? "--> ": "\n");
+        lst = lst->next;
+    }
 }
 // --------------------------- //
 
@@ -146,6 +157,106 @@ void printList(list* lst)
 int compareCircleLists(list** lst1, list** lst2)
 {
     // your code:
+    int lst1Size, lst2Size, rv, failureCnt = 0, seqSuccessCnt = 0, startCntSuccess = 0, isEqual;
+    list *tmpHead1, *tmpHead2;
+
+    // Getting length of lists, comparing lengths.
+    lst1Size = circleListLength(*lst1);
+    lst2Size = circleListLength(*lst2);
+    rv = (lst1Size != lst2Size) ? 0: 1;
+
+    // If both lists are empty, no need to "break circles" --> returns rv
+    if (lst2Size == 0 && lst1Size == 0) {
+        return rv;
+    }
+
+    tmpHead1 = *lst1;
+    tmpHead2 = *lst2;
+    // Checking content only if lengths are equal, and both lists are not empty.
+    if (rv) {
+        // Using 2 counters here to follow failures and sequential successes.
+        // This loop will determine if the lists are equal or not.
+        while (failureCnt < lst1Size && seqSuccessCnt < lst1Size) {
+            // Turning isEqual on when data is equal
+            isEqual = (tmpHead1->data == tmpHead2->data) ? 1 : 0;
+            // Starting to progress second list only when there is a match
+            tmpHead2 = isEqual ? tmpHead2->next : tmpHead2;
+            tmpHead1 = tmpHead1->next;
+            // Failure cnt will increase each time there is miss-match,
+            // In case the first item not in second list, cnt will be 6 and loop will end --> rv = 0.
+            failureCnt += isEqual ? 0 : 1;
+            // startCntSuccess turns on after first match, tells seqSuccessCnt to start counting sequential successes.
+            startCntSuccess = isEqual ? 1 : startCntSuccess;
+            seqSuccessCnt += (isEqual) ? 1 : 0;
+            // Break loop in case startCntSuccess is turned on while isEqual is false, meaning that we started counting success,
+            // But found miss-match while doing so.
+            if (!isEqual && startCntSuccess) {
+                // Setting failureCnt to lst1Size so rv will be false
+                failureCnt = lst1Size;
+                break;
+            }
+//            printf("failureCnt: %d\n", failureCnt);
+//            printf("seqSuccessCnt: %d\n", seqSuccessCnt);
+        }
+        rv = (failureCnt == lst1Size) ? 0 : 1;
+    }
+
+    breakList(lst1, lst1Size);
+    breakList(lst2, lst2Size);
+    // Breaking circles
+//    int minAscii1, minAscii2, nextAsc1, nextAsc2, minFound = 0, counter = 0;
+
+//    minAscii1 = tmpHead1->data - 0;
+//    minAscii2 = tmpHead2->data - 0;
+//    while(tmpHead1->next && tmpHead2->next) {
+//        printf("CURRENT HEAD1: %c\nCURRENT HEAD2: %c\n", tmpHead1->data, tmpHead2->data);
+//        if (!minFound) {
+//            counter++;
+//            nextAsc1 = tmpHead1->next->data - 0;
+//            nextAsc2 = tmpHead2->next->data - 0;
+//            minAscii1 = (nextAsc1 < minAscii1) ? nextAsc1: minAscii2;
+//            minAscii2 = (nextAsc2 < minAscii2) ? nextAsc2: minAscii2;
+//            printf("MIN1: %d\n MIN2: %d\n", minAscii1, minAscii2);
+//        }
+//        else {
+//            if (nextAsc1 == minAscii1) {
+//                (*lst1) = tmpHead1->next;
+//                tmpHead1->next = NULL;
+//            }
+//            if (nextAsc2 == minAscii2) {
+//                (*lst2) = tmpHead2->next;
+//                tmpHead2->next = NULL;
+//            }
+//        }
+//        minFound = (counter == lst1Size) ? 1: 0;
+//        if (tmpHead1->next) {
+//            tmpHead1 = tmpHead1->next;
+//        }
+//        if (tmpHead1->next) {
+//            tmpHead2 = tmpHead2->next;
+//        }
+//    }
+
+    return rv;
+}
+
+void breakList(list **lst, int size) {
+    if (!size) {
+        return;
+    }
+    list *temp, *head = *lst, *prev;
+    int minAscii = temp->data-0, nextAscii;
+    while(size--) {
+        nextAscii = temp->next->data-0;
+        if (nextAscii < minAscii) {
+            minAscii = nextAscii;
+            head =
+            prev = temp;
+        }
+        temp = temp->next;
+    }
+    *lst = head->next;
+    prev->next = NULL;
 }
 // --------------------------- //
 
@@ -159,6 +270,19 @@ int compareCircleLists(list** lst1, list** lst2)
 int circleListLength(list* lst)
 {
     // your code:
+    if (!(lst)) {
+        return 0;
+    }
+    // At least 1 item.
+    int cnt = 1;
+    // Marking first item's data.
+    char first = lst->data;
+    while(first != lst->next->data) {
+        // Increasing cnt & progressing list until we complete cycle
+        cnt++;
+        lst = lst->next;
+    }
+    return cnt;
 }
 // --------------------------- //
 
@@ -171,5 +295,11 @@ int circleListLength(list* lst)
 void freeList(list** lst)
 {
     // your code:
+    list *tmp;
+    while (*lst) {
+        tmp = *lst; // Keep ptr for deletion
+        *lst = (*lst)->next; // Advance in the list
+        free(tmp); // Free saved ptr
+    }
 }
 // --------------------------- //
