@@ -34,8 +34,6 @@ int circleListLength(list *lst);
 void printList(list* lst);
 void freeList(list** lst);
 
-void breakList(list **lst, int size);
-
 // --------------------------------------- //
 // Main section:
 // --------------------------------------- //
@@ -46,7 +44,6 @@ int main()
     list* lst1 = NULL, *lst2 = NULL;
     char str1[] = "duezax";
     char str2[] = "zaxdue";
-//    char str3[] = "xdueza";
     // call functions:
     id_num = student_id();
     printf("[id: %lu] start main\n", id_num);
@@ -195,68 +192,54 @@ int compareCircleLists(list** lst1, list** lst2)
                 failureCnt = lst1Size;
                 break;
             }
-//            printf("failureCnt: %d\n", failureCnt);
-//            printf("seqSuccessCnt: %d\n", seqSuccessCnt);
         }
         rv = (failureCnt == lst1Size) ? 0 : 1;
     }
-
-    breakList(lst1, lst1Size);
-    breakList(lst2, lst2Size);
     // Breaking circles
-//    int minAscii1, minAscii2, nextAsc1, nextAsc2, minFound = 0, counter = 0;
-
-//    minAscii1 = tmpHead1->data - 0;
-//    minAscii2 = tmpHead2->data - 0;
-//    while(tmpHead1->next && tmpHead2->next) {
-//        printf("CURRENT HEAD1: %c\nCURRENT HEAD2: %c\n", tmpHead1->data, tmpHead2->data);
-//        if (!minFound) {
-//            counter++;
-//            nextAsc1 = tmpHead1->next->data - 0;
-//            nextAsc2 = tmpHead2->next->data - 0;
-//            minAscii1 = (nextAsc1 < minAscii1) ? nextAsc1: minAscii2;
-//            minAscii2 = (nextAsc2 < minAscii2) ? nextAsc2: minAscii2;
-//            printf("MIN1: %d\n MIN2: %d\n", minAscii1, minAscii2);
-//        }
-//        else {
-//            if (nextAsc1 == minAscii1) {
-//                (*lst1) = tmpHead1->next;
-//                tmpHead1->next = NULL;
-//            }
-//            if (nextAsc2 == minAscii2) {
-//                (*lst2) = tmpHead2->next;
-//                tmpHead2->next = NULL;
-//            }
-//        }
-//        minFound = (counter == lst1Size) ? 1: 0;
-//        if (tmpHead1->next) {
-//            tmpHead1 = tmpHead1->next;
-//        }
-//        if (tmpHead1->next) {
-//            tmpHead2 = tmpHead2->next;
-//        }
-//    }
+    if (*lst1) {
+        // In case linked list contain only 1 item
+        if (lst1Size == 1) {
+            (*lst1)->next = NULL;
+        }
+        else {
+            list *temp = *lst1, *head, *prev;
+            int minAscii = temp->data-0, nextAscii;
+            while(lst1Size--) {
+                nextAscii = temp->next->data-0;
+                if (nextAscii < minAscii) {
+                    minAscii = nextAscii;
+                    head = temp->next;
+                    prev = temp;
+                }
+                temp = temp->next;
+            }
+            *lst1 = head;
+            prev->next = NULL;
+        }
+    }
+    if (*lst2) {
+        // In case linked list contain only 1 item
+        if (lst2Size == 1) {
+            (*lst2)->next = NULL;
+        }
+        else {
+            list *temp = *lst2, *head, *prev;
+            int minAscii = temp->data-0, nextAscii;
+            while(lst2Size--) {
+                nextAscii = temp->next->data-0;
+                if (nextAscii < minAscii) {
+                    minAscii = nextAscii;
+                    head = temp->next;
+                    prev = temp;
+                }
+                temp = temp->next;
+            }
+            *lst2 = head;
+            prev->next = NULL;
+        }
+    }
 
     return rv;
-}
-
-void breakList(list **lst, int size) {
-    if (!size) {
-        return;
-    }
-    list *temp, *head = *lst, *prev;
-    int minAscii = temp->data-0, nextAscii;
-    while(size--) {
-        nextAscii = temp->next->data-0;
-        if (nextAscii < minAscii) {
-            minAscii = nextAscii;
-            head =
-            prev = temp;
-        }
-        temp = temp->next;
-    }
-    *lst = head->next;
-    prev->next = NULL;
 }
 // --------------------------- //
 
